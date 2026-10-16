@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <meta name="theme-color" content="#1269DB" />
+    <title>No Internet Connection</title>
+
+    <style>
+        :root {
+            --primary-color: #1269DB;
+            --primary-hover: #0e56b8;
+            --text-color: #2c3e50;
+            --text-muted: #7f8c8d;
+            --bg-color: #f4f6f9;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+
+        .container {
+            background: white;
+            padding: 50px 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            max-width: 480px;
+            width: 90%;
+            transition: transform 0.3s ease;
+        }
+
+        /* Logo Styling */
+        .brand-logo {
+            max-width: 150px;
+            height: auto;
+            margin-bottom: 30px;
+            display: inline-block;
+        }
+
+        /* Icon Animation */
+        .offline-illustration {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 20px;
+            background: #ecf0f1;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .offline-svg {
+            width: 50px;
+            height: 50px;
+            fill: var(--text-muted);
+            animation: pulse 2s infinite;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0 0 10px;
+            color: var(--text-color);
+        }
+
+        p {
+            font-size: 16px;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin: 0 0 30px;
+        }
+
+        /* Button Styling */
+        .btn-retry {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(18, 105, 219, 0.3);
+        }
+
+        .btn-retry:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(18, 105, 219, 0.4);
+        }
+
+        .btn-retry:active {
+            transform: translateY(0);
+        }
+
+        .btn-retry svg {
+            width: 18px;
+            height: 18px;
+            fill: white;
+        }
+
+        /* Keyframes */
+        @keyframes pulse {
+            0% { opacity: 0.5; transform: scale(0.95); }
+            50% { opacity: 1; transform: scale(1.05); }
+            100% { opacity: 0.5; transform: scale(0.95); }
+        }
+
+        /* Snackbar (Tetap disimpan untuk notifikasi) */
+        #snackbar {
+            visibility: hidden;
+            min-width: 250px;
+            margin-left: -125px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 2px;
+            padding: 16px;
+            position: fixed;
+            z-index: 1;
+            left: 50%;
+            bottom: 30px;
+            font-size: 14px;
+        }
+
+        #snackbar.show {
+            visibility: visible;
+            animation: fadein 0.5s, fadeout 0.5s 2.5s;
+        }
+
+        @keyframes fadein {
+            from {bottom: 0; opacity: 0;}
+            to {bottom: 30px; opacity: 1;}
+        }
+
+        @keyframes fadeout {
+            from {bottom: 30px; opacity: 1;}
+            to {bottom: 0; opacity: 0;}
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <img src="assets/jobcy/img/logo.png" class="brand-logo" alt="MyInternship Logo">
+
+        <div class="offline-illustration">
+            <svg class="offline-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M23.64 7c-.45-.34-4.93-4-11.64-4C5.28 3 .81 6.66.36 7l10.08 12.56c.8 1 2.32 1 3.12 0L23.64 7zM3.27 8.5C4.95 7.07 8.35 5 12 5c3.65 0 7.05 2.07 8.73 3.5L12 19.33 3.27 8.5z"/>
+                <path d="M0 0h24v24H0z" fill="none"/>
+                <line x1="1" y1="1" x2="23" y2="23" stroke="#7f8c8d" stroke-width="2" />
+            </svg>
+        </div>
+
+        <h1>No Internet Connection</h1>
+        <p>It seems you are offline. Check your WiFi or data connection and try again.</p>
+
+        <button class="btn-retry" onclick="window.location.reload()">
+            <svg viewBox="0 0 24 24">
+                <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.13.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+            </svg>
+            Try Again
+        </button>
+    </div>
+
+    <div id="snackbar">You are currently offline</div>
+
+    <script>
+        // Script sederhana untuk trigger snackbar saat load
+        window.onload = function() {
+            var x = document.getElementById("snackbar");
+            x.className = "show";
+            setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+        }
+    </script>
+
+</body>
+</html>

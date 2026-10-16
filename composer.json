@@ -1,0 +1,44 @@
+{
+  "name": "almasaeed2010/adminlte",
+  "description": "AdminLTE - admin control panel and dashboard that's based on Bootstrap 3",
+  "homepage": "https://adminlte.io/",
+  "type": "template",
+  "keywords": [
+    "css",
+    "js",
+    "less",
+    "responsive",
+    "back-end",
+    "template",
+    "theme",
+    "web",
+    "admin"
+  ],
+  "authors": [
+    {
+      "name": "Abdullah Almsaeed",
+      "email": "abdullah@almsaeedstudio.com"
+    }
+  ],
+  "license": "MIT",
+  "support": {
+    "issues": "https://github.com/almasaeed2010/AdminLTE/issues"
+  },
+  "require": {
+    "bower-asset/jquery": ">=1.9.0 <4.0.0",
+    "alhimik1986/php-excel-templator": "^1.0",
+    "phpoffice/phpword": "^1.1",
+    "intervention/image": "^2.7",
+    "geniusts/hijri-dates": "^1.1",
+    "jenssegers/blade": "^1.4",
+    "dompdf/dompdf": "^3.1",
+    "mpdf/mpdf": "^8.2",
+    "phpoffice/phpspreadsheet": "^1.29.0"
+  },
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://asset-packagist.org"
+    }
+  ]
+}

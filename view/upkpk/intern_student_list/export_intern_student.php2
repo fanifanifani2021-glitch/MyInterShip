@@ -1,0 +1,117 @@
+<?php defined('BASE_PATH' or header('Location: /'));
+
+error_reporting(false); session_start();
+use alhimik1986\PhpExcelTemplator\PhpExcelTemplator;
+require_once('./vendor/autoload.php'); // if you don't use framework
+
+$no = [];
+$nim = [];
+$student_name = [];
+$study_program = [];
+$internship_status2 = [];
+$internship_date2 = [];
+$internship_period2 = [];
+
+
+
+
+$sql2 = $_SESSION['EXPORT']['INTERN_STUDENT']['QUERY'];
+$stmt = $_SERVER['PDO']->prepare($sql2);
+
+$bindings = $_SESSION['EXPORT']['INTERN_STUDENT']['BINDING'];
+
+// Bind semua parameter
+foreach ($bindings as $key => $value) {
+    $stmt->bindValue($key, $value); // Menggunakan bindValue untuk parameter yang tidak berubah
+}
+
+
+$stmt->execute();
+
+$get_student = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Looping data hasil query
+foreach ($get_student as $index => $data) :
+
+	$sql = "SELECT * FROM internship WHERE nim = :nim ORDER BY id_internship DESC LIMIT 1";
+	$stmt = $_SERVER['PDO']->prepare( $sql );
+	$stmt->bindParam( ':nim', $data['nim'], PDO::PARAM_INT );
+
+	$stmt->execute();
+	
+	if ( $stmt->rowCount() < 1 ) {
+		$internship_status = 'None';
+		$internship_period = '-';
+		$internship_date = '-';
+	} else {
+
+		$internship = $stmt->fetch( PDO::FETCH_ASSOC );
+
+		if (in_array($internship['status'], ['WAITING', 'Waiting'])) {
+			$internship_status = 'Currently Submitting';
+
+			$internship_date = '-';
+			$internship_period = '-';
+		} else
+
+		if (in_array($internship['status'], [NULL])) {
+			$internship_status = 'None';
+			$internship_period = '-';
+			$internship_date = '-';
+		} else 
+		if (in_array($internship['status'], ['YES','Yes', 1])) {
+			$internship_status = 'Internship Accepted';
+			$internship_period = range_time_elapsed_string($internship['start_date'], $internship['end_date']);
+			$internship_date = date('d-M-Y', strtotime($internship['start_date'])) . " until " . date('d-M-Y', strtotime($internship['end_date']));
+		
+			$internship_date .= ' (' .$internship_period. ')';
+		
+		} else
+	
+		if (in_array($internship['status'], ['NO', 'No', 0])) {
+			$internship_status = 'Rejected by Company';
+			$internship_date = '-';
+			$internship_period = '-';
+		}
+	}
+
+
+
+
+	array_push($no, $index+1);
+	array_push($nim, $data['nim']);
+	array_push($student_name, $data['name']);
+	array_push($study_program, '(' . $data['program_study'] . ') ' . $data['jenjang'] . " " . $data['prodi']);
+	array_push($internship_status2, $internship_status ?? '-');
+	array_push($internship_date2, $internship_date ?? '-');
+	array_push($internship_period2, $internship_period ?? '-');
+
+
+endforeach;
+
+
+$location = 'excel/generate/';
+// $excel_name = 'internship_student.xlsx';
+$excel_name = 'internship_student' .uniqid(). '.xlsx';
+$file_name = $excel_name;
+
+
+
+$a = PhpExcelTemplator::saveToFile('excel/export_student.xlsx', $location . $excel_name, [
+	'{generated_on}' => date('Y-m-d H:i:s'),
+	'{server_name}' => $_SERVER['APP_NAME'] . ' (' . base_url() . ')',
+	'{no}' => $no,
+	'{nim}' => $nim,
+	'{student_name}' => $student_name,
+	'{study_program}' => $study_program,
+	'{internship_status}' => $internship_status2,
+	'{internship_date}' => $internship_date2,
+	'{internship_period}' => $internship_period2,
+]);
+
+
+ignore_user_abort();
+
+set_time_limit(0);
+
+echo "<script> window.setTimeout(function(){ window.location = 'index.php?viewer=excel_generate&location=" .base64_encode($excel_name). "'; }, 100); </script>"; exit;

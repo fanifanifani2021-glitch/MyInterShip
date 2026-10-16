@@ -1,0 +1,204 @@
+{
+    "timestamp": "2026-09-25 11:28:16",
+    "code": 404,
+    "message": "Route not found",
+    "route": "cdc/lecturer/core/component/sweetalert2.min.css",
+    "method": "GET",
+    "ip": "::1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
+    "file": "C:\\xampp_new\\htdocs\\pblKita\\System\\core\\Router.php",
+    "line": 613,
+    "get": {
+        "route": "cdc/lecturer/core/component/sweetalert2.min.css"
+    },
+    "post": [],
+    "raw_input": ""
+}
+
+{
+    "timestamp": "2026-09-25 11:28:16",
+    "code": 404,
+    "message": "Route not found",
+    "route": "cdc/lecturer/core/component/sweetalert2.min.js",
+    "method": "GET",
+    "ip": "::1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
+    "file": "C:\\xampp_new\\htdocs\\pblKita\\System\\core\\Router.php",
+    "line": 613,
+    "get": {
+        "route": "cdc/lecturer/core/component/sweetalert2.min.js"
+    },
+    "post": [],
+    "raw_input": ""
+}
+
+{
+    "timestamp": "2026-09-25 11:28:16",
+    "code": 404,
+    "message": "Route not found",
+    "route": "cdc/lecturer/core/component/soloalert.js",
+    "method": "GET",
+    "ip": "::1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
+    "file": "C:\\xampp_new\\htdocs\\pblKita\\System\\core\\Router.php",
+    "line": 613,
+    "get": {
+        "route": "cdc/lecturer/core/component/soloalert.js"
+    },
+    "post": [],
+    "raw_input": ""
+}
+
+{
+    "timestamp": "2026-09-25 11:28:25",
+    "code": 404,
+    "message": "Route not found",
+    "route": "cdc/lecturer/core/component/sweetalert2.min.js",
+    "method": "GET",
+    "ip": "::1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
+    "file": "C:\\xampp_new\\htdocs\\pblKita\\System\\core\\Router.php",
+    "line": 613,
+    "get": {
+        "route": "cdc/lecturer/core/component/sweetalert2.min.js"
+    },
+    "post": [],
+    "raw_input": ""
+}
+
+{
+    "timestamp": "2026-09-25 11:28:25",
+    "code": 404,
+    "message": "Route not found",
+    "route": "cdc/lecturer/core/component/sweetalert2.min.css",
+    "method": "GET",
+    "ip": "::1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
+    "file": "C:\\xampp_new\\htdocs\\pblKita\\System\\core\\Router.php",
+    "line": 613,
+    "get": {
+        "route": "cdc/lecturer/core/component/sweetalert2.min.css"
+    },
+    "post": [],
+    "raw_input": ""
+}
+
+{
+    "timestamp": "2026-09-25 11:28:25",
+    "code": 404,
+    "message": "Route not found",
+    "route": "cdc/lecturer/core/component/soloalert.js",
+    "method": "GET",
+    "ip": "::1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
+    "file": "C:\\xampp_new\\htdocs\\pblKita\\System\\core\\Router.php",
+    "line": 613,
+    "get": {
+        "route": "cdc/lecturer/core/component/soloalert.js"
+    },
+    "post": [],
+    "raw_input": ""
+}
+
+{
+    "timestamp": "2026-09-25 12:49:10",
+    "code": 404,
+    "message": "Route not found",
+    "route": "cdc/lecturer/core/component/sweetalert2.min.css",
+    "method": "GET",
+    "ip": "::1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
+    "file": "C:\\xampp_new\\htdocs\\pblKita\\System\\core\\Router.php",
+    "line": 613,
+    "get": {
+        "route": "cdc/lecturer/core/component/sweetalert2.min.css"
+    },
+    "post": [],
+    "raw_input": ""
+}
+
+{
+    "timestamp": "2026-09-25 12:49:11",
+    "code": 404,
+    "message": "Route not found",
+    "route": "cdc/lecturer/core/component/soloalert.js",
+    "method": "GET",
+    "ip": "::1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
+    "file": "C:\\xampp_new\\htdocs\\pblKita\\System\\core\\Router.php",
+    "line": 613,
+    "get": {
+        "route": "cdc/lecturer/core/component/soloalert.js"
+    },
+    "post": [],
+    "raw_input": ""
+}
+
+{
+    "timestamp": "2026-09-25 12:49:11",
+    "code": 404,
+    "message": "Route not found",
+    "route": "cdc/lecturer/core/component/sweetalert2.min.js",
+    "method": "GET",
+    "ip": "::1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
+    "file": "C:\\xampp_new\\htdocs\\pblKita\\System\\core\\Router.php",
+    "line": 613,
+    "get": {
+        "route": "cdc/lecturer/core/component/sweetalert2.min.js"
+    },
+    "post": [],
+    "raw_input": ""
+}
+
+{
+    "timestamp": "2026-09-25 12:49:45",
+    "code": 404,
+    "message": "Route not found",
+    "route": "cdc/internship/core/component/sweetalert2.min.css",
+    "method": "GET",
+    "ip": "::1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
+    "file": "C:\\xampp_new\\htdocs\\pblKita\\System\\core\\Router.php",
+    "line": 613,
+    "get": {
+        "route": "cdc/internship/core/component/sweetalert2.min.css"
+    },
+    "post": [],
+    "raw_input": ""
+}
+
+{
+    "timestamp": "2026-09-25 12:49:46",
+    "code": 404,
+    "message": "Route not found",
+    "route": "cdc/internship/core/component/sweetalert2.min.js",
+    "method": "GET",
+    "ip": "::1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
+    "file": "C:\\xampp_new\\htdocs\\pblKita\\System\\core\\Router.php",
+    "line": 613,
+    "get": {
+        "route": "cdc/internship/core/component/sweetalert2.min.js"
+    },
+    "post": [],
+    "raw_input": ""
+}
+
+{
+    "timestamp": "2026-09-25 12:49:46",
+    "code": 404,
+    "message": "Route not found",
+    "route": "cdc/internship/core/component/soloalert.js",
+    "method": "GET",
+    "ip": "::1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
+    "file": "C:\\xampp_new\\htdocs\\pblKita\\System\\core\\Router.php",
+    "line": 613,
+    "get": {
+        "route": "cdc/internship/core/component/soloalert.js"
+    },
+    "post": [],
+    "raw_input": ""
+}
+

@@ -1,0 +1,23 @@
+Utamanya pendaftaran ada 2, kerjasama dan mandiri
+
+kerjasama terbagi 2, kerjasama offer dan self
+
+
+Done 1. Kalau kerjasama apakah perlu input offer ? Apakah perusahaan kerjasama perlu buka offer terlebih dahulu atau mahasiswa bisa langsung lamar ?
+
+Di status perusahaan kalau 1 enggak bisa offer, tapi kalau 2 bisa offer.
+
+Done 2. Kalau mandiri, berarti enggak ada offer otomatis enggak isi aplicant.
+
+Done 3. Apakah nanti yang daftar mandiri, upkpk perlu daftarin hrd lagi untuk perusahaannya ?
+
+Done 4. Kalau perusahaan yang mandiri enggak divalidasi UPKPK apakah register nya gagal ? bagaimana cara dia nolak mahasiswa mandiri. Triknya di tolak oleh DKM.
+
+Done 5. Berapa lama waktu tunggu tiap register kalau misalnya perusahaan enggak respon ? Apakah bisa daftar dua kali?
+
+
+Daftar Magang bisa daftar berkali kali => rencananya.
+
+
+Menu Register Internship jadikan dropdown, bagi jadi Self Registration dan Kerja sama yang pilih perusahaan.
+Coba bikin register mandiri dulu

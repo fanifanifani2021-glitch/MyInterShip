@@ -1,0 +1,543 @@
+<link rel="stylesheet" href="./core/component/sweetalert2.min.css">
+<script defer src="./core/component/sweetalert2.min.js"></script>
+<script defer src="./core/component/soloalert.js"></script>
+
+<!-- Javascript Function -->
+<script type="text/javascript">
+/* -----------------------
+   Utility: copy to clipboard
+   - gunakan navigator.clipboard jika tersedia
+   - fallback ke execCommand
+------------------------*/
+function copyToClipboard(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function() {
+            Swal.fire({ title: 'Copied', text: text, icon: 'success', timer: 1500, showConfirmButton: false });
+        }, function(err) {
+            alert('Failed to copy: ' + err);
+        });
+        return;
+    }
+
+    // fallback legacy
+    var tempInput = document.createElement("input");
+    document.body.appendChild(tempInput);
+    tempInput.value = text;
+    tempInput.select();
+    try {
+        document.execCommand("copy");
+        alert("Text copied to clipboard: " + text);
+    } catch (err) {
+        alert("Could not copy text: " + err);
+    }
+    document.body.removeChild(tempInput);
+}
+
+/* ---------------------------------------------------------
+   submitFormAjax
+   - pastikan tidak double-bind: .off('submit') sebelum .on
+   - hanya panggil validation_reset di complete (1x)
+   - sync CKEditor instances (tetap)
+----------------------------------------------------------*/
+function submitFormAjax(formSelector, method, successCallback, errorCallback = handleFormError) {
+    // prevent double binding if function dipanggil berulang
+    $(formSelector).off('submit').on('submit', function (e) {
+        e.preventDefault();
+
+        let $form = $(this);
+        let submitBtn = $form.find('[type="submit"]').first();
+        let submitBtnHtml = submitBtn.html();
+
+        submitBtn.prop('disabled', true);
+        submitBtn.html('<i class="fa fa-spinner fa-spin mr-1"></i> Loading');
+
+        // Sync CKEditor (jika ada)
+        if (typeof CKEDITOR !== 'undefined' && CKEDITOR.instances) {
+            for (const editorName in CKEDITOR.instances) {
+                if (CKEDITOR.instances.hasOwnProperty(editorName)) {
+                    CKEDITOR.instances[editorName].updateElement();
+                }
+            }
+        }
+
+        let data = $form.serialize();
+
+        $.ajax({
+            url: $form.attr('action'),
+            type: method,
+            dataType: 'json',
+            data: data,
+            success: function (data, textStatus, jqXHR) {
+                if (typeof successCallback === 'function') {
+                    successCallback(data);
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                if (typeof errorCallback === 'function') {
+                    errorCallback(formSelector, jqXHR);
+                }
+            },
+            complete: function () {
+                // restore button
+                submitBtn.html(submitBtnHtml);
+                submitBtn.prop('disabled', false);
+
+                // reset validation messages server-side (panggil sekali)
+                $.ajax({ url: 'index.php?request=validation_reset', type: 'GET' });
+            }
+        });
+    });
+}
+
+/* ---------------------------------------------------------
+   handleFormError
+   - menampilkan feedback per-field
+   - lebih hati-hati dalam mengubah class (tidak menghapus semua class)
+----------------------------------------------------------*/
+function handleFormError(formSelector, jqXHR) {
+    if (!jqXHR || jqXHR.status !== 400) {
+        // fallback: tampilkan generic error
+        Swal.fire({ title: 'Error', text: 'Request failed', icon: 'error' });
+        return;
+    }
+
+    var responseJSON = jqXHR.responseJSON || {};
+
+    // validation messages (field => message)
+    if (responseJSON.validation) {
+        $.each(responseJSON.validation, function (key, value) {
+            if (value !== '') {
+                let inputElem = $(formSelector).find('input[name="' + key + '"], select[name="' + key + '"], textarea[name="' + key + '"]');
+                if (inputElem.length > 0) {
+                    // buat atau update element .invalid-feedback
+                    let feedbackElem = inputElem.siblings('.invalid-feedback');
+                    if (feedbackElem.length === 0) {
+                        inputElem.after('<small class="invalid-feedback"></small>');
+                        feedbackElem = inputElem.siblings('.invalid-feedback');
+                    }
+                    feedbackElem.text(value);
+                    // add invalid class
+                    inputElem.addClass('is-invalid');
+                }
+            }
+        });
+    }
+
+    // error classes mapping (server dapat mengirim object error)
+    if (responseJSON.error) {
+        $.each(responseJSON.error, function (key, className) {
+            let inputElem = $(formSelector).find('input[name="' + key + '"], select[name="' + key + '"], textarea[name="' + key + '"]');
+            if (inputElem.length > 0) {
+                // jangan hapus semua class, hanya hapus status class
+                inputElem.removeClass('is-valid is-invalid border-success border-danger').addClass(className);
+            }
+        });
+    }
+
+    getNotificationForm(formSelector);
+}
+
+/* ---------------------------------------------------------
+   getNotificationForm
+   - ambil sekali, append hati-hati (hindari duplikasi)
+----------------------------------------------------------*/
+function getNotificationForm(formSelector) {
+    $.ajax({
+        url: 'index.php?request=validation_get',
+        type: 'GET',
+        success: function (response) {
+            console.log('Getting form notification');
+
+            // Jika response berupa elemen yang ingin dimasukkan, cek duplikasi:
+            // misalnya server memberi elemen dengan id tertentu => avoid duplication
+            var $response = $(response);
+            if ($response.length && $response.attr('id')) {
+                if ($('#' + $response.attr('id')).length === 0) {
+                    $('body').append($response);
+                } else {
+                    console.log('Notification element already present, skip append');
+                }
+            } else {
+                // jika tidak ada id, append langsung (beware duplicates)
+                $('body').append(response);
+            }
+        },
+        error: function () {
+            console.log('Failed Getting form notification');
+        }
+    });
+    return true;
+}
+
+/* ---------------------------------------------------------
+   resetForm
+   - reset field states
+----------------------------------------------------------*/
+function resetForm(formSelector) {
+    var $form = $(formSelector);
+    $form.removeClass('was-validated');
+    $form.find('.border-danger').removeClass('border-danger');
+    $form.find('.is-invalid').removeClass('is-invalid');
+    $form.find('.is-valid').removeClass('is-valid');
+    $form.find('.border-success').removeClass('border-success');
+    // clear feedback texts
+    $form.find('.invalid-feedback').text('');
+    $form.trigger('reset');
+
+    $.ajax({ url: 'index.php?request=validation_reset', type: 'GET' });
+    return true;
+}
+
+/* ---------------------------------------------------------
+   resetFormAjax
+   - perbaikan selector: '.was-validated' (ada dot)
+   - jangan double bind klik reset
+----------------------------------------------------------*/
+function resetFormAjax(formSelector2) {
+    var $form = $(formSelector2);
+    $form.find('[type="reset"]').off('click').on('click', function (e) {
+        e.preventDefault();
+
+        let submitBtn = $form.find('[type="submit"]').first();
+        let resetBtn = $(this);
+        let resetBtnHtml = resetBtn.html();
+
+        resetBtn.prop('disabled', true);
+        submitBtn.prop('disabled', true);
+
+        resetBtn.html('<i class="fa fa-spinner fa-spin mr-1"></i> Loading');
+
+        $form.find('.was-validated').removeClass('was-validated');
+        $form.find('.border-danger').removeClass('border-danger');
+        $form.find('.is-invalid').removeClass('is-invalid');
+        $form.find('.is-valid').removeClass('is-valid');
+        $form.find('.border-success').removeClass('border-success');
+        $form.find('.invalid-feedback').text('');
+        $form.trigger('reset');
+
+        $.ajax({
+            url: 'index.php?request=validation_reset',
+            type: 'GET',
+            complete: function () {
+                resetBtn.html(resetBtnHtml);
+                resetBtn.prop('disabled', false);
+                submitBtn.prop('disabled', false);
+            }
+        });
+    });
+}
+
+/* ---------------------------------------------------------
+   logout_confirm
+----------------------------------------------------------*/
+function logout_confirm() {
+    let _token = $('meta[name="csrf-token"]').attr('content');
+
+    Swal.fire({
+        title: 'Logout Confirmation',
+        text: 'Are you sure you want to end your current session?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "Yes, I want to logout!"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            
+            // Menentukan Base URL secara Otomatis (Localhost vs Production Server)
+            let pathArray = window.location.pathname.split('/');
+            
+            // Jika berjalan di sub-folder localhost (misal: /myinternship/...)
+            // Ambil subfolder pertama ('myinternship'), jika di server root maka kosongkan
+            let subFolder = (pathArray[1] && pathArray[1] !== 'index.php') ? '/' + pathArray[1] : '';
+            let redirectUrl = window.location.origin + subFolder;
+
+            $.ajax({
+                url: "index.php?request=logout",
+                type: "POST",
+                data: { 'token': _token },
+                success: function () {
+                    setTimeout(function () {
+                        // Clear Local Storage
+                        localStorage.setItem('first', null);
+                        localStorage.setItem('first_chime', null);
+                        localStorage.setItem('next_chime', null);
+                        
+                        // Redirect ke Base URL Aplikasi
+                        window.location.href = redirectUrl;
+                    }, 200);
+                },
+                error: function () {
+                    // Fallback redirect jika AJAX gagal/timeout
+                    window.location.href = redirectUrl;
+                }
+            });
+        }
+    });
+}
+
+/* ---------------------------
+   Base64 object (tetap)
+----------------------------*/
+var Base64 = {
+    _keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
+    encode: function (e) {
+        var t = "";
+        var n, r, i, s, o, u, a;
+        var f = 0;
+        e = Base64._utf8_encode(e);
+        while (f < e.length) {
+            n = e.charCodeAt(f++);
+            r = e.charCodeAt(f++);
+            i = e.charCodeAt(f++);
+            s = n >> 2;
+            o = (n & 3) << 4 | r >> 4;
+            u = (r & 15) << 2 | i >> 6;
+            a = i & 63;
+            if (isNaN(r)) {
+                u = a = 64;
+            } else if (isNaN(i)) {
+                a = 64;
+            }
+            t = t + this._keyStr.charAt(s) + this._keyStr.charAt(o) + this._keyStr.charAt(u) + this._keyStr.charAt(a);
+        }
+        return t;
+    },
+    decode: function (e) {
+        var t = "";
+        var n, r, i;
+        var s, o, u, a;
+        var f = 0;
+        e = e.replace(/[^A-Za-z0-9\+\/\=]/g, "");
+        while (f < e.length) {
+            s = this._keyStr.indexOf(e.charAt(f++));
+            o = this._keyStr.indexOf(e.charAt(f++));
+            u = this._keyStr.indexOf(e.charAt(f++));
+            a = this._keyStr.indexOf(e.charAt(f++));
+            n = s << 2 | o >> 4;
+            r = (o & 15) << 4 | u >> 2;
+            i = (u & 3) << 6 | a;
+            t = t + String.fromCharCode(n);
+            if (u != 64) {
+                t = t + String.fromCharCode(r);
+            }
+            if (a != 64) {
+                t = t + String.fromCharCode(i);
+            }
+        }
+        t = Base64._utf8_decode(t);
+        return t;
+    },
+    _utf8_encode: function (e) { /* unchanged */ 
+        e = e.replace(/\r\n/g, "\n");
+        var t = "";
+        for (var n = 0; n < e.length; n++) {
+            var r = e.charCodeAt(n);
+            if (r < 128) {
+                t += String.fromCharCode(r);
+            } else if (r > 127 && r < 2048) {
+                t += String.fromCharCode(r >> 6 | 192);
+                t += String.fromCharCode(r & 63 | 128);
+            } else {
+                t += String.fromCharCode(r >> 12 | 224);
+                t += String.fromCharCode(r >> 6 & 63 | 128);
+                t += String.fromCharCode(r & 63 | 128);
+            }
+        }
+        return t;
+    },
+    _utf8_decode: function (e) { /* unchanged */
+        var t = "";
+        var n = 0;
+        var r = c1 = c2 = 0;
+        while (n < e.length) {
+            r = e.charCodeAt(n);
+            if (r < 128) {
+                t += String.fromCharCode(r);
+                n++;
+            } else if (r > 191 && r < 224) {
+                c2 = e.charCodeAt(n + 1);
+                t += String.fromCharCode((r & 31) << 6 | c2 & 63);
+                n += 2;
+            } else {
+                c2 = e.charCodeAt(n + 1);
+                c3 = e.charCodeAt(n + 2);
+                t += String.fromCharCode((r & 15) << 12 | (c2 & 63) << 6 | c3 & 63);
+                n += 3;
+            }
+        }
+        return t;
+    }
+};
+
+/* ---------------------------------------------------------
+   konfirmasi sederhana
+----------------------------------------------------------*/
+function konfirmasi(notif, lokasi) {
+    if (confirm(notif) === true) {
+        window.location.href = lokasi;
+    }
+}
+
+/* ---------------------------------------------------------
+   cek_upload
+   - terima id input (string), validasi tipe dan ukuran
+----------------------------------------------------------*/
+function cek_upload(id_input_file, maksimal_file_mb) {
+    var file_upload = document.getElementById(id_input_file);
+    if (!file_upload || !file_upload.files || !file_upload.files[0]) return;
+
+    var file = file_upload.files[0];
+
+    if (file.type !== "application/pdf") {
+        alert('File harus berupa pdf !');
+        file_upload.value = "";
+        return;
+    }
+
+    if (file.size > maksimal_file_mb * 1024 * 1024) {
+        alert('Maksimal ukuran file adalah ' + maksimal_file_mb + ' MB !');
+        file_upload.value = "";
+    }
+}
+
+/* ---------------------------------------------------------
+   spinner
+   - aman untuk dipanggil dari onclick="spinner(event)"
+   - fallback ke event global
+----------------------------------------------------------*/
+function spinner(e) {
+    e = e || window.event;
+    var target = e.currentTarget || e.target || this;
+
+    // jika target adalah <i> sendiri, ambil parent button
+    if (target.tagName && target.tagName.toLowerCase() === 'i') {
+        target = target.closest('button') || target;
+    }
+
+    var icon_spinner = target.querySelector('i');
+    if (!icon_spinner) return;
+
+    var icon_old = icon_spinner.className || '';
+    var spinnerClass = "fas fa-spinner fa-spin mr-1";
+
+    icon_spinner.className = spinnerClass;
+
+    setTimeout(function () {
+        icon_spinner.className = icon_old;
+    }, 2000);
+}
+
+/* ---------------------------------------------------------
+   parseSize: support "10MB", "1024", integer etc.
+----------------------------------------------------------*/
+function parseSize(size) {
+    const units = {
+        B: 1,
+        KB: 1024,
+        MB: 1024 * 1024,
+        GB: 1024 * 1024 * 1024,
+        TB: 1024 * 1024 * 1024 * 1024
+    };
+
+    if (!isNaN(size) && Number.isInteger(Number(size))) {
+        return parseInt(size, 10);
+    } else {
+        const pattern = /^(\d+(?:\.\d+)?)\s*([BKMGT]B)$/i;
+        const matches = ('' + size).match(pattern);
+
+        if (matches && matches.length === 3) {
+            const value = parseFloat(matches[1]);
+            const unit = matches[2].toUpperCase();
+
+            if (!isNaN(value) && units[unit]) {
+                return value * units[unit];
+            }
+        }
+        return null;
+    }
+}
+
+/* ---------------------------------------------------------
+   validateFile
+   - perbaikan parsing allowedTypes
+   - cek file ada
+----------------------------------------------------------*/
+function validateFile(fileInput, maxSize, allowedTypes = '') {
+    if (!fileInput || !fileInput.files || !fileInput.files[0]) return false;
+    const file = fileInput.files[0];
+
+    // build allowedTypesList: prefer explicit parameter, otherwise fallback to input.accept
+    let allowedTypesList = [];
+    if (allowedTypes && typeof allowedTypes === 'string' && allowedTypes.trim() !== '') {
+        allowedTypesList = allowedTypes.split(',').map(type => type.trim()).filter(Boolean);
+    } else if (fileInput.accept) {
+        allowedTypesList = fileInput.accept.split(',').map(type => type.trim()).filter(Boolean);
+    }
+
+    const fileType = file.type;
+    const fileSize = file.size;
+    const maxBytes = parseSize(maxSize);
+
+    // size check
+    if (!maxBytes || fileSize > maxBytes) {
+        setTimeout(function () {
+            Swal.fire({
+                title: 'File size exceeded limit',
+                text: `Maximum size : ${maxSize}`,
+                icon: 'error',
+                timer: 3000,
+                showConfirmButton: true
+            });
+        }, 10);
+
+        fileInput.value = '';
+        return false;
+    }
+
+    // type check: if allowedTypesList empty => skip check
+    if (allowedTypesList.length > 0) {
+        // if allowedTypesList contains MIME types like 'application/pdf' or extensions like '.pdf'
+        var isAllowed = allowedTypesList.some(function (t) {
+            t = t.toLowerCase();
+            if (t.charAt(0) === '.') {
+                // extension match
+                return file.name.toLowerCase().endsWith(t);
+            }
+            // mime type match (exact)
+            return fileType === t;
+        });
+
+        if (!isAllowed) {
+            console.log(allowedTypesList);
+            setTimeout(function () {
+                Swal.fire({
+                    title: 'Chosen file is not supported',
+                    icon: 'error',
+                    timer: 2000,
+                    showConfirmButton: true
+                });
+            }, 10);
+            fileInput.value = '';
+            return false;
+        }
+    }
+
+    return true;
+}
+</script>
+
+<style>
+    .disabled2 { pointer-events: none; }
+    .not-avail { text-decoration: line-through; pointer-events: none; color: #808080; }
+
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track {
+        -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+        box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+        background: #fff;
+    }
+    ::-webkit-scrollbar-thumb { background: #6c757d; }
+
+    .wrap { white-space: normal !important; word-wrap: break-word; min-width: 140px; max-width: 140px; }
+    .wrap2 { white-space: normal !important; word-wrap: break-word; min-width: 170px; max-width: 170px; }
+</style>

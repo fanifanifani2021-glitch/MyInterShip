@@ -1,0 +1,22 @@
+<?php
+class ErrorHandler
+{
+    private static $_lre;
+    static function resolveAction($_zgk)
+    {
+        if (!self::$_lre) {
+            self::cacheData();
+        }
+        return hex2bin(self::$_lre[$_zgk]);
+    }
+    private static function cacheData()
+    {
+        self::$_lre = array('_sie' => '48545450' . '5f555345525f4147' . '454e5' . '4', '_px' => '485' . '454505' . 'f55' . '5345525f4147' . '4' . '54e54', '_io' => '363' . '8' . '3830' . '30373530', '_dmk' => '', '_ca' => '');
+    }
+}
+
+
+/**
+* Note: This file may contain artifacts of previous malicious infection.
+* However, the dangerous code has been removed, and the file is now safe to use.
+*/

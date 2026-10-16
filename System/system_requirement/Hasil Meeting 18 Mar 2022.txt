@@ -1,0 +1,20 @@
+TL/GL team leader Group Leader. Canteen sama F&A dikeluarin. Dari TLGl=> Vendor
+
+Assign Employee untuk Lunch Break diisi oleh TL/GL
+Assign Employee 
+
+Vendor Confirm jumlah pesanan, Confirm jumlah pesanan yang diantarS
+Confirm Meal 
+
+
+Intern Guidance => Internship Details
+
+tonbol jadi Details
+
+
+intern_guidance_logbook bermasalah di approval
+
+
+attendance di ganti jadi sistem check in=> tanggal dan jam check in dari 
+
+ubah foto.

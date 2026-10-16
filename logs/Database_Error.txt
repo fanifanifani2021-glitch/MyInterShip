@@ -1,0 +1,5 @@
+Timestamp : Fri, 18 - Sep - 2026 | 12:19:41
+Data      :
+Connection Failed: SQLSTATE[HY000] [1049] Unknown database 'my_internship_pbl'
+
+--------------------------------------------------

@@ -1,0 +1,50 @@
+
+Kata Kunci:
+Aplikasi selain polbat, tidak bisa mengelola cdc
+Data Perusahaan dipegang oleh Polibatam
+Data CDC dipegang oleh Polibatam
+
+1. Buat CRUD tabel kampus dan menambah data kampus
+1.5. Buat CRUD Lecturer di CDC
+2. Table upkpk tambahin id_kampus, biar tau ini dari kampus mana. Selain CDC Polibatam tidak bisa edit CDC
+3. Polibatam menambah tb_company langsung, sedangkan kalau diluar Polibatam, Nambah kampus via Koneksi DB MyIn Polibatam
+4. Buat koneksi ke database MyIn Polibatam
+
+
+- CDC menambah data kampus, tb_kampus isi polibatam
+- table company tambahin id_kampus.
+- tabel student_internship tambahin id_kampus, biar tau dari mahasiswa dari kampus mana
+
+
+Jurusan ? Prodi ?
+
+
+
+Poltek luar mau bergabung ?
+
+Masalah
+1. Login API di Mahasiswa dan Lecturer Polibatam
+2. Kelola Jurusan dan Prodi + Tambah Atribut Nama Poltek di Kelola Prodi
+
+Solusi
+
+Pertama 
+- Clone aplikasi nya
+- Ubah tabel student, tambah kolom password, kolom nama poltek
+- Ubah tabel lecturer. tambah kolom password, nama poltek
+
+- Poltek lain dapat akun CDC
+- CDC mengelola lecturer (tambah fitur CRUD Lecturer) dan coordinator
+- Coodinator bisa menmabah Mahasiswa dan DPM
+
+Permasalahan untuk Solusi Pertama
+- Data perusahaan dapat diakses bersama
+- 
+
+
+Kedua
+- Ubah tabel student, tambah kolom password, kolom nama poltek
+- Ubah tabel lecturer. tambah kolom password, nama poltek
+- Buat CRUD untuk Jurusan dan Ubah kelola Prodi dengan dara jurusan dari CRUD Jurusan
+
+

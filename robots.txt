@@ -1,0 +1,61 @@
+User-agent: *
+
+# Blok area sensitif / internal
+Disallow: /cdc/
+Disallow: /lecturer/
+Disallow: /auth/
+Disallow: /logout/
+
+# === BLOK FILE SENSITIF ===
+Disallow: /.env
+Disallow: /.htaccess
+Disallow: /composer.json
+Disallow: /composer.lock
+Disallow: /package.json
+Disallow: /package-lock.json
+Disallow: /bower.json
+Disallow: /Gruntfile.js
+Disallow: /README.md
+Disallow: /changelog.md
+
+# === BLOK FOLDER BACKEND / INTERNAL ===
+Disallow: /ajax/
+Disallow: /api/
+Disallow: /controller/
+Disallow: /core/
+Disallow: /database/
+Disallow: /documentation/
+Disallow: /excel/
+Disallow: /library/
+Disallow: /logs/
+Disallow: /middleware/
+Disallow: /model/
+Disallow: /routes/
+Disallow: /storage/
+Disallow: /system_requirement/
+Disallow: /tmp/
+Disallow: /vendor/
+Disallow: /web/
+Disallow: /word/
+Disallow: /localhost/
+
+# === BLOK USER DATA ===
+Disallow: /upload/
+
+# === IZINKAN FILE TEKNIS ===
+Allow: /viewer.php
+Allow: /api.php
+Allow: /sw.js
+Allow: /upup.min.js
+Allow: /upup.sw.min.js
+Allow: /offline.html
+
+# === IZINKAN ASSET PUBLIK ===
+Allow: /assets/
+Allow: /appland-assets/
+Allow: /font/
+Allow: /public/
+
+# === SITEMAP ===
+Sitemap: https://myinternship.id/sitemap.xml
+

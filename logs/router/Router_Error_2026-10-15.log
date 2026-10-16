@@ -1,0 +1,17 @@
+{
+    "timestamp": "2026-10-15 11:00:10",
+    "code": 404,
+    "message": "Route not found",
+    "route": "assets/img/students/profile.jpg",
+    "method": "GET",
+    "ip": "::1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+    "file": "C:\\laragon2\\www\\pblKita\\System\\core\\Router.php",
+    "line": 613,
+    "get": {
+        "route": "assets/img/students/profile.jpg"
+    },
+    "post": [],
+    "raw_input": ""
+}
+

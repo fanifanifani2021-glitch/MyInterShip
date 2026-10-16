@@ -1,0 +1,131 @@
+# ======================================
+# SEO Friendly URL & Routing
+# ======================================
+RewriteEngine On
+Options -Indexes
+
+RewriteRule ^\.well-known/ - [L]
+RewriteRule ^(favicon\.ico|apple-touch-icon.*\.png)$ - [L]
+
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{QUERY_STRING} !.+
+
+RewriteRule ^(.+)$ index.php?route=$1 [L]
+
+
+# ======================================
+# Security: Block Sensitive Files
+# ======================================
+
+# Block env file
+<FilesMatch "^\.env">
+    Require all denied
+</FilesMatch>
+
+# Block config files (IMPORTANT)
+<FilesMatch "^(config\.php|database\.php)$">
+    Require all denied
+</FilesMatch>
+
+# # Block internal system marker file (if used)
+<FilesMatch "^core\.file$">
+    Require all denied
+</FilesMatch>
+
+# # Block upload marker
+<FilesMatch "^upload\.file$">
+    Require all denied
+</FilesMatch>
+
+
+# ======================================
+# PHP Limits
+# ======================================
+
+
+
+# ======================================
+# ⚠️ Web Application Firewall
+# (Disable ONLY if you know what you're doing)
+# ======================================
+<IfModule mod_security.c>
+    SecRuleEngine Off
+    SecFilterInheritance Off
+    SecFilterEngine Off
+    SecFilterScanPOST Off
+</IfModule>
+
+
+# ======================================
+# Performance: Compression
+# ======================================
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/css text/javascript
+    AddOutputFilterByType DEFLATE application/javascript application/json
+    AddOutputFilterByType DEFLATE application/xml application/xhtml+xml
+    AddOutputFilterByType DEFLATE image/svg+xml image/x-icon
+    AddOutputFilterByType DEFLATE font/ttf font/otf font/woff font/woff2
+
+    BrowserMatch ^Mozilla/4 gzip-only-text/html
+    BrowserMatch ^Mozilla/4\.0[678] no-gzip
+    BrowserMatch \bMSIE !no-gzip !gzip-only-text/html
+</IfModule>
+
+
+# ======================================
+# Performance: Cache Control
+# ======================================
+<IfModule mod_expires.c>
+    ExpiresActive On
+
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/png  "access plus 1 year"
+    ExpiresByType image/gif  "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+
+    ExpiresByType font/ttf   "access plus 1 year"
+    ExpiresByType font/otf   "access plus 1 year"
+    ExpiresByType font/woff  "access plus 1 year"
+    ExpiresByType font/woff2 "access plus 1 year"
+
+    ExpiresByType text/css "access plus 1 year"
+    ExpiresByType application/javascript "access plus 1 year"
+</IfModule>
+
+
+# ======================================
+# Headers (Optional hardening)
+# ======================================
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+</IfModule>
+
+<IfModule mod_headers.c>
+    Header add Link "<https://myinternship.id/security-policy>; rel=\"security-policy\""
+</IfModule>
+
+# ======================================
+# Security Headers (SAFE MODE)
+# ======================================
+<IfModule mod_headers.c>
+
+    # Prevent MIME sniffing
+    Header always set X-Content-Type-Options "nosniff"
+
+    # Clickjacking protection
+    Header always set X-Frame-Options "SAMEORIGIN"
+
+    # Referrer control
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+    # Disable unused browser features
+    Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(self)"
+
+    # HTTPS enforcement (SAFE)
+    Header always set Strict-Transport-Security "max-age=31536000"
+
+</IfModule>
+
+
