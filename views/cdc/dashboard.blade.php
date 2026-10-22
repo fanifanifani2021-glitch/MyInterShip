@@ -270,7 +270,7 @@ $stmt_stat = $_SERVER['PDO']->prepare($sql);
                                 <div class="span-mode"></div>
                             </div>
 
-                            <a href="index.php?page=show_data&action=companies_ranking_major&year=2021&major=Informatics Engineering" class="btn btn-info btn-sm" id="show-data-companies-major-btn">
+                            <a href="index.php?page=show_data&action=companies_ranking_received_student&year={{ date('Y') }}" class="btn btn-info btn-sm" id="show-data-companies-major-btn">
                                 Show Data
                             </a>
                         </div>
@@ -737,11 +737,10 @@ $stmt_stat = $_SERVER['PDO']->prepare($sql);
         document.getElementById('major-selector').addEventListener('change', updateMajorURL);
 
         function updateMajorURL() {
-            const year = document.getElementById('major_year-selector').value;
-            const major = document.getElementById('major-selector').value;
+            const year = document.getElementById('major_year-selector').value || '{{ date("Y") }}';
+            const major = document.getElementById('major-selector').value || '';
 
-            // Bangun URL hanya jika tahun terisi
-            let url = `index.php?page=show_data&action=companies_ranking_major&year=${year}`;
+            let url = `index.php?page=show_data&action=companies_ranking_received_student&year=${year}`;
             if (major) {
                 url += `&major=${encodeURIComponent(major)}`;
             }
@@ -749,6 +748,8 @@ $stmt_stat = $_SERVER['PDO']->prepare($sql);
             document.getElementById('show-data-companies-major-btn').setAttribute('href', url);
         }
 
+        // Panggil saat awal render agar URL tombol langsung sinkron
+        setTimeout(updateMajorURL, 300);
     </script>
 
 

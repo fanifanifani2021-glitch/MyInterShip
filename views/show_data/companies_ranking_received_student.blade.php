@@ -1,460 +1,381 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('templates.cdc')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Companies Ranking - Received Student</title>
+@push('head-scripts')
+<!-- DataTables CSS -->
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css">
 
-    <!-- Bootstrap CSS (versi 5.x) -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+    .badge-status {
+        font-size: 0.82rem;
+        font-weight: 600;
+        padding: 6px 14px;
+        border-radius: 20px;
+    }
+    .form-label-custom {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 6px;
+    }
+    .table-custom th {
+        background-color: #f8fafc !important;
+        color: #334155 !important;
+        font-weight: 700 !important;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        border-top: none !important;
+        vertical-align: middle !important;
+    }
+    .table-custom td {
+        vertical-align: middle !important;
+        font-size: 0.9rem;
+    }
+    .dataTables_wrapper .dataTables_filter input {
+        border-radius: 6px;
+        border: 1px solid #ebedf2;
+        padding: 6px 12px;
+        margin-left: 8px;
+    }
+    .dataTables_wrapper .dataTables_length select {
+        border-radius: 6px;
+        border: 1px solid #ebedf2;
+        padding: 4px 8px;
+    }
+</style>
+@endpush
 
-    <!-- DataTables CSS (opsional, untuk interaktif tabel) -->
-    <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
-    <!-- DataTables Buttons (CSS & JS) -->
-    <link href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css" rel="stylesheet">
+@section('main-content')
+<div class="container">
 
-
-
-    <style>
-        #student-wrapper {
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            padding: 20px;
-            background-color: #f9f9f9;
-        }
-
-        #student-wrapper h5 {
-            font-weight: bold;
-            margin-bottom: 15px;
-            color: #333;
-        }
-
-        #student-table th {
-            background-color: #f1f1f1;
-            text-align: center;
-        }
-
-        #student-table td {
-            vertical-align: middle;
-        }
-    </style>
-
-
-</head>
-
-<body>
-
-    <div class="container mt-4">
-
-        <!-- Dropdown Tahun + Tombol Back -->
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <div class="d-flex align-items-center">
-                <a href="index.php" class="btn btn-secondary btn-sm me-3">
-                    ← Back
-                </a>
-            </div>
-        </div>
-
-
-        <!-- FILTER SECTION -->
-        <div class="card shadow-sm mb-4" style="border-radius: 6px; border: 1px solid #e5e7eb;">
-
-            <div class="p-3 pb-0">
-                <h5 class="fw-bold mb-3" style="color:#2b2b2b;">Filter Data Mahasiswa Magang</h5>
-            </div>
-
-            <form id="rankingFilterForm" method="GET" action="index.php">
-                <input type="hidden" name="page" value="show_data">
-                <input type="hidden" name="action" value="companies_ranking_received_student">
-
-                <div class="p-3 pt-0">
-
-                    <div class="row gy-3">
-
-                        <!-- Start Date -->
-                        <div class="col-md-3">
-                            <label class="form-label fw-semibold">Start Date</label>
-                            <input type="date" id="filter_start_date" name="start_date" class="form-control"
-                                value="<?= $start_date ?>">
-                        </div>
-
-                        <!-- End Date -->
-                        <div class="col-md-3">
-                            <label class="form-label fw-semibold">End Date</label>
-                            <input type="date" id="filter_end_date" name="end_date" class="form-control"
-                                value="<?= $end_date ?>">
-                        </div>
-
-                        <!-- Major -->
-                        <div class="col-md-3">
-                            <label class="form-label fw-semibold">Major</label>
-                            <select id="filter_major" name="major" class="form-select" selectedMajor="{{ $major }}">
-                                <option value="">— All Majors —</option>
-                            </select>
-                        </div>
-
-                        <!-- Program Study -->
-                        <div class="col-md-3">
-                            <label class="form-label fw-semibold">Study Program</label>
-                            <select id="filter_prodi" name="prodi" class="form-select" selectedProdi="{{ $prodi }}">
-                                <option value="">— All Study Programs —</option>
-                            </select>
-                        </div>
-
-                    </div>
-
-                    <!-- Button -->
-                    <div class="mt-3 text-end">
-                        <button type="button" class="btn btn-primary px-4" onclick="submitRankingFilter()">
-                            Filter
-                        </button>
-                    </div>
-
+    <!-- Header Panel Biru Khas Atlantis Dashboard -->
+    <div class="panel-header bg-primary-gradient">
+        <div class="page-inner py-5">
+            <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row">
+                <div>
+                    <h2 class="text-white pb-2 fw-bold">
+                        <i class="fas fa-user-graduate mr-2"></i> Data Mahasiswa Magang
+                    </h2>
+                    <h5 class="text-white op-7 mb-2">
+                        Pusat Karir & Kerjasama (CDC) Polibatam
+                    </h5>
                 </div>
-
-            </form>
-
-        </div>
-
-
-
-        <!-- RANKING TABLE SECTION -->
-        <div class="card shadow-sm p-3 mb-4" style="border-radius: 6px; border: 1px solid #e5e7eb;">
-
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="fw-bold mb-0" style="color:#2b2b2b;">
-                    Top 10 Perusahaan Penerima Mahasiswa Magang
-                </h5>
+                <div class="ml-md-auto py-2 py-md-0">
+                    <!-- Tombol Kembali ke Dashboard -->
+                    <a href="index.php" class="btn btn-white btn-round font-weight-bold text-primary shadow-sm">
+                        <i class="fas fa-arrow-left mr-1"></i> Kembali ke Dashboard
+                    </a>
+                </div>
             </div>
-
-            <table id="ranking-table" class="table table-bordered table-sm align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th style="width:80px; text-align:center;">Ranking</th>
-                        <th>Perusahaan</th>
-                        <th style="width:180px; text-align:center;">Jumlah Mahasiswa</th>
-                        <th style="width:150px; text-align:center;">Mahasiswa</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    <?php foreach ($data_stat['company_trophies'] as $row): ?>
-                    <tr>
-                        <td class="text-center fw-bold"><?= $row['ranking'] ?></td>
-                        <td><?= htmlspecialchars($row['name_company']) ?></td>
-                        <td class="text-center"><?= $row['jumlah_mahasiswa'] ?> Mahasiswa</td>
-                        <td class="text-center">
-                            <button class="btn btn-info btn-sm" data-id="<?= $row['id_company'] ?>"
-                                data-major="<?= $major ?>" data-prodi="<?= $prodi ?>"
-                                data-start_date="{{ $start_date }}" data-end_date="{{ $end_date }}"
-                                data-company="<?= htmlspecialchars($row['name_company']) ?>"
-                                data-ranking="<?= $row['ranking'] ?>">
-                                Lihat Semua
-                            </button>
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-
-        </div>
-
-
-        <!-- Wrapper untuk daftar mahasiswa -->
-        <div id="student-wrapper" class="mt-4" style="display: none;">
-            <h5 id="student-info-title">Daftar Mahasiswa Magang, Perusahaan : ?? Periode : ??</h5>
-
-            <table id="student-table" class="table table-striped table-sm">
-                <thead>
-                    <tr>
-                        <th>NIM</th>
-                        <th>Nama</th>
-                        <th>Jurusan</th>
-                        <th>Prodi</th>
-                        <th>Start</th>
-                        <th>End</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-
-            </table>
         </div>
     </div>
 
+    <div class="page-inner mt--5">
+        <div class="row mt--2">
+            <div class="col-md-12">
 
+                <!-- CARD FILTER -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <div class="card-title text-primary font-weight-bold">
+                            <i class="fas fa-filter mr-2"></i> Filter Data Mahasiswa Magang
+                        </div>
+                        <small class="text-muted">Filter dapat digunakan bersamaan</small>
+                    </div>
 
+                    <div class="card-body">
+                        <form id="filterForm" method="GET" action="index.php">
+                            <input type="hidden" name="page" value="show_data">
+                            <input type="hidden" name="action" value="companies_ranking_received_student">
 
-    <!-- jQuery (dibutuhkan untuk DataTables) -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+                            <div class="row">
+                                <!-- 1. Start Date -->
+                                <div class="col-md-3 form-group">
+                                    <label class="form-label-custom">
+                                        <i class="far fa-calendar-alt text-muted mr-1"></i> Start Date
+                                    </label>
+                                    <input type="date" id="filter_start_date" name="start_date" class="form-control"
+                                        value="<?= htmlspecialchars($start_date) ?>">
+                                </div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+                                <!-- 2. End Date -->
+                                <div class="col-md-3 form-group">
+                                    <label class="form-label-custom">
+                                        <i class="far fa-calendar-alt text-muted mr-1"></i> End Date
+                                    </label>
+                                    <input type="date" id="filter_end_date" name="end_date" class="form-control"
+                                        value="<?= htmlspecialchars($end_date) ?>">
+                                </div>
 
-    <!-- DataTables JS -->
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+                                <!-- 3. Major (Jurusan) -->
+                                <div class="col-md-3 form-group">
+                                    <label class="form-label-custom">
+                                        <i class="fas fa-graduation-cap text-muted mr-1"></i> Major (Jurusan)
+                                    </label>
+                                    <select id="filter_major" name="major" class="form-control" data-selected="<?= htmlspecialchars($major) ?>">
+                                        <option value="">— Semua Jurusan —</option>
+                                    </select>
+                                </div>
 
-    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.bootstrap5.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+                                <!-- 4. Study Program (Prodi) -->
+                                <div class="col-md-3 form-group">
+                                    <label class="form-label-custom">
+                                        <i class="fas fa-book-open text-muted mr-1"></i> Study Program (Prodi)
+                                    </label>
+                                    <select id="filter_prodi" name="prodi" class="form-control" data-selected="<?= htmlspecialchars($prodi) ?>">
+                                        <option value="">— Semua Program Studi —</option>
+                                    </select>
+                                </div>
 
+                                <!-- 5. Company (Perusahaan) -->
+                                <div class="col-md-12 form-group">
+                                    <label class="form-label-custom">
+                                        <i class="far fa-building text-muted mr-1"></i> Company (Perusahaan)
+                                    </label>
+                                    <select id="filter_company" name="company" class="form-control">
+                                        <option value="">— Semua Perusahaan —</option>
+                                        <?php foreach ($companies as $comp): ?>
+                                            <option value="<?= htmlspecialchars($comp['name']) ?>" <?= ($company === $comp['name'] || $company == $comp['id_company']) ? 'selected' : '' ?>>
+                                                <?= htmlspecialchars($comp['name']) ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            </div>
 
-    <script>
-    function submitRankingFilter() {
-        document.getElementById("rankingFilterForm").submit();
-    }
+                            <!-- Tombol Aksi Filter -->
+                            <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                                <div>
+                                    <span class="badge badge-primary p-2">
+                                        Total Data Ditemukan: <strong><?= count($students) ?></strong> Mahasiswa
+                                    </span>
+                                </div>
+                                <div>
+                                    <a href="index.php?page=show_data&action=companies_ranking_received_student" class="btn btn-outline-secondary btn-sm mr-2">
+                                        <i class="fas fa-undo mr-1"></i> Reset Filter
+                                    </a>
+                                    <button type="submit" class="btn btn-primary btn-sm px-3 font-weight-bold">
+                                        <i class="fas fa-search mr-1"></i> Terapkan Filter
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
 
-    // ---- DATA dari PHP ----
-    let programStudy = @json($program_study);
+                <!-- CARD TABEL HASIL -->
+                <div class="card shadow-sm">
+                    <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
+                        <div>
+                            <div class="card-title text-dark font-weight-bold">
+                                <i class="fas fa-table mr-2 text-primary"></i> Tabel Data Magang Mahasiswa
+                            </div>
+                            <small class="text-muted">Pencarian dapat melalui Nama Mahasiswa, NIM, atau Perusahaan</small>
+                        </div>
+                        <!-- Tombol Unduh Excel, CSV & Cetak -->
+                        <div class="d-flex gap-2 mt-2 mt-md-0">
+                            <a href="index.php?page=show_data&action=companies_ranking_received_student&export=excel&start_date=<?= urlencode($start_date) ?>&end_date=<?= urlencode($end_date) ?>&major=<?= urlencode($major) ?>&prodi=<?= urlencode($prodi) ?>&company=<?= urlencode($company) ?>" 
+                               class="btn btn-success btn-sm font-weight-bold mr-2 shadow-sm" title="Unduh hasil filter ke Excel (.xlsx)">
+                                <i class="fas fa-file-excel mr-1"></i> Unduh Excel
+                            </a>
+                            <a href="index.php?page=show_data&action=companies_ranking_received_student&export=csv&start_date=<?= urlencode($start_date) ?>&end_date=<?= urlencode($end_date) ?>&major=<?= urlencode($major) ?>&prodi=<?= urlencode($prodi) ?>&company=<?= urlencode($company) ?>" 
+                               class="btn btn-primary btn-sm font-weight-bold mr-2 shadow-sm" title="Unduh hasil filter ke CSV (.csv)">
+                                <i class="fas fa-file-csv mr-1"></i> Unduh CSV
+                            </a>
+                            <button type="button" id="btn-print-table" class="btn btn-secondary btn-sm font-weight-bold shadow-sm" title="Cetak data magang mahasiswa">
+                                <i class="fas fa-print mr-1"></i> Cetak
+                            </button>
+                        </div>
+                    </div>
 
-    // ---- GROUP PRODI BY MAJOR ----
-    let groupedProdi = {};
-    programStudy.forEach(p => {
-        if (!groupedProdi[p.major]) groupedProdi[p.major] = [];
-        groupedProdi[p.major].push(p);
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table id="internshipTable" class="table table-bordered table-hover table-custom w-100">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 50px;" class="text-center">No</th>
+                                        <th>Nama Mahasiswa</th>
+                                        <th style="width: 140px;" class="text-center">NIM</th>
+                                        <th>Jurusan</th>
+                                        <th>Program Studi</th>
+                                        <th>Perusahaan</th>
+                                        <th style="width: 150px;" class="text-center">Status Magang</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php if (!empty($students)): ?>
+                                        <?php $no = 1; foreach ($students as $row): ?>
+                                            <tr>
+                                                <td class="text-center font-weight-bold text-muted"><?= $no++ ?></td>
+                                                <td>
+                                                    <div class="font-weight-bold text-dark"><?= htmlspecialchars($row['student_name']) ?></div>
+                                                    <small class="text-muted">
+                                                        <i class="far fa-calendar-check mr-1"></i>
+                                                        <?= htmlspecialchars($row['start_date']) ?> s/d <?= htmlspecialchars($row['end_date']) ?>
+                                                    </small>
+                                                </td>
+                                                <td class="text-center font-weight-bold text-primary font-monospace">
+                                                    <?= htmlspecialchars($row['nim']) ?>
+                                                </td>
+                                                <td><?= htmlspecialchars($row['jurusan']) ?></td>
+                                                <td>
+                                                    <?= htmlspecialchars(trim(($row['jenjang'] ? $row['jenjang'] . ' ' : '') . $row['prodi'])) ?>
+                                                </td>
+                                                <td>
+                                                    <i class="far fa-building text-muted mr-1"></i>
+                                                    <strong><?= htmlspecialchars($row['company_name']) ?></strong>
+                                                </td>
+                                                <td class="text-center">
+                                                    <span class="badge badge-status <?= $row['badge_class'] ?>">
+                                                        <?= htmlspecialchars($row['status_label']) ?>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <tr>
+                                            <td colspan="7" class="text-center py-4 text-muted">
+                                                <i class="far fa-folder-open fa-2x mb-2 d-block"></i>
+                                                Tidak ada data magang yang sesuai dengan filter.
+                                            </td>
+                                        </tr>
+                                    <?php endif; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+@endsection
+
+@push('footer-scripts')
+<!-- DataTables Script & Print Extension -->
+<script src="assets/js/plugin/datatables/datatables.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+
+<script>
+    // ---- DATA PROGRAM STUDI DARI PHP ----
+    const programStudyData = <?= json_encode($program_study) ?>;
+
+    // Grouping Prodi berdasarkan Major / Jurusan
+    const groupedProdi = {};
+    programStudyData.forEach(p => {
+        const majorKey = p.major || p.jurusan || 'Lainnya';
+        if (!groupedProdi[majorKey]) {
+            groupedProdi[majorKey] = [];
+        }
+        groupedProdi[majorKey].push(p);
     });
 
-    // ---- GENERATE DROPDOWN MAJOR ----
-    let majorSelect = document.getElementById('filter_major');
-    Object.keys(groupedProdi).forEach(major => {
-        majorSelect.innerHTML += `<option value="${major}">${major}</option>`;
+    // 1. Populate Dropdown Major
+    const majorSelect = document.getElementById('filter_major');
+    const selectedMajor = majorSelect.getAttribute('data-selected') || '';
+
+    Object.keys(groupedProdi).sort().forEach(major => {
+        const isSelected = (major === selectedMajor) ? 'selected' : '';
+        majorSelect.innerHTML += `<option value="${major}" ${isSelected}>${major}</option>`;
     });
 
-    // ---- GENERATE DROPDOWN PRODI ----
-    let prodiSelect = document.getElementById('filter_prodi');
+    // 2. Generate Dropdown Prodi berdasarkan Major
+    const prodiSelect = document.getElementById('filter_prodi');
+    const selectedProdi = prodiSelect.getAttribute('data-selected') || '';
 
-    function generateProdiDropdown(selectedMajor = "") {
-        prodiSelect.innerHTML = `<option value="">— All Study Programs —</option>`;
+    function renderProdiDropdown(targetMajor = "") {
+        prodiSelect.innerHTML = `<option value="">— Semua Program Studi —</option>`;
 
-        // SHOW ALL MAJOR
-        if (selectedMajor === "") {
-            Object.keys(groupedProdi).forEach(major => {
-                prodiSelect.innerHTML += `<optgroup label="${major}">`;
-                prodiSelect.innerHTML += `<option value="MAJOR:${major}">All Program Study in ${major}</option>`;
+        if (targetMajor === "") {
+            // Tampilkan semua prodi dikelompokkan berdasarkan optgroup
+            Object.keys(groupedProdi).sort().forEach(major => {
+                let optGroup = `<optgroup label="${major}">`;
+                optGroup += `<option value="MAJOR:${major}">Semua Prodi di ${major}</option>`;
 
                 groupedProdi[major].forEach(p => {
-                    prodiSelect.innerHTML += `
-                        <option value="PS:${p.kode_prodi}">
-                            ${p.jenjang} - ${p.study_program}
-                        </option>`;
+                    const val = `PS:${p.kode_prodi}`;
+                    const isSel = (val === selectedProdi || p.kode_prodi === selectedProdi) ? 'selected' : '';
+                    optGroup += `<option value="${val}" ${isSel}>${p.jenjang ? p.jenjang + ' - ' : ''}${p.study_program || p.prodi}</option>`;
                 });
 
-                prodiSelect.innerHTML += `</optgroup>`;
+                optGroup += `</optgroup>`;
+                prodiSelect.innerHTML += optGroup;
             });
-            return;
+        } else {
+            // Tampilkan prodi dari major yang dipilih
+            if (groupedProdi[targetMajor]) {
+                prodiSelect.innerHTML += `<option value="MAJOR:${targetMajor}">Semua Prodi di ${targetMajor}</option>`;
+                groupedProdi[targetMajor].forEach(p => {
+                    const val = `PS:${p.kode_prodi}`;
+                    const isSel = (val === selectedProdi || p.kode_prodi === selectedProdi) ? 'selected' : '';
+                    prodiSelect.innerHTML += `<option value="${val}" ${isSel}>${p.jenjang ? p.jenjang + ' - ' : ''}${p.study_program || p.prodi}</option>`;
+                });
+            }
         }
-
-        // SHOW SPECIFIC MAJOR
-        prodiSelect.innerHTML += `<optgroup label="${selectedMajor}">`;
-        prodiSelect.innerHTML += `<option value="MAJOR:${selectedMajor}">All Program Study in ${selectedMajor}</option>`;
-
-        groupedProdi[selectedMajor].forEach(p => {
-            prodiSelect.innerHTML += `
-                <option value="PS:${p.kode_prodi}">
-                    ${p.jenjang} - ${p.study_program}
-                </option>`;
-        });
-
-        prodiSelect.innerHTML += `</optgroup>`;
     }
 
-    // ---- AMBIL SELECTED DARI ATTRIBUTE ----
-    let selectedMajor = $('#filter_major').attr('selectedMajor');  // Contoh: "Informatics Engineering"
-    let selectedProdi = $('#filter_prodi').attr('selectedProdi');  // Contoh: "PS:IF" atau "MAJOR:Informatics Engineering"
+    // Jalankan render prodi pertama kali
+    renderProdiDropdown(selectedMajor);
 
-    // ---- LOAD AWAL (berdasarkan GET) ----
-    if (selectedMajor && selectedMajor !== "") {
-        $('#filter_major').val(selectedMajor);
-        generateProdiDropdown(selectedMajor);
-    } else {
-        generateProdiDropdown();
-    }
-
-    // Set selected Prodi (PS / MAJOR)
-    if (selectedProdi && selectedProdi !== "") {
-        $('#filter_prodi').val(selectedProdi);
-    }
-
-    // ---- EVENT CHANGE MAJOR ----
+    // Event change ketika major dipilih/diganti
     $('#filter_major').on('change', function () {
-        generateProdiDropdown($(this).val());
-        $('#filter_prodi').val(""); // reset pilihan prodi saat ganti major
+        const chosenMajor = $(this).val();
+        renderProdiDropdown(chosenMajor);
+        $('#filter_prodi').val('');
     });
 
-</script>
-
-
-
-
-    <script>
-        let studentTable = null;
-
-        function initStudentTable(title, rawCompanyName, start_date, end_date) {
-            if (studentTable) {
-                studentTable.destroy();
+    // Inisialisasi DataTable
+    $(document).ready(function () {
+        const table = $('#internshipTable').DataTable({
+            responsive: true,
+            paging: true,
+            pageLength: 10,
+            lengthMenu: [
+                [10, 25, 50, 100, -1],
+                ['10 Data', '25 Data', '50 Data', '100 Data', 'Semua Data']
+            ],
+            order: [[0, 'asc']],
+            dom: "<'row mb-3'<'col-md-6 d-flex align-items-center'l><'col-md-6 d-flex justify-content-end'f>>" +
+                 "<'row'<'col-12'tr>>" +
+                 "<'row mt-3'<'col-md-5'i><'col-md-7 d-flex justify-content-end'p>>",
+            language: {
+                search: "_INPUT_",
+                searchPlaceholder: "Cari nama, NIM, atau perusahaan...",
+                lengthMenu: "Tampilkan _MENU_ data per halaman",
+                info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data mahasiswa",
+                infoEmpty: "Menampilkan 0 data",
+                infoFiltered: "(disaring dari _MAX_ total data)",
+                zeroRecords: "Tidak ada data yang sesuai",
+                paginate: {
+                    first: '<i class="fas fa-angle-double-left"></i>',
+                    last: '<i class="fas fa-angle-double-right"></i>',
+                    next: '<i class="fas fa-angle-right"></i>',
+                    previous: '<i class="fas fa-angle-left"></i>'
+                }
             }
-
-            // Sanitasi nama file: hilangkan karakter tidak aman
-            const safeCompany = rawCompanyName
-                    .replace(/[^a-z0-9]/gi, '_')   // karakter tidak aman → _
-                    .replace(/_+/g, '_')           // rapihkan underscore berlebihan
-                    .replace(/^_+|_+$/g, '')       // hapus underscore di awal/akhir
-                    .toLowerCase();
-
-            // Sanitasi tanggal: ganti "-" jadi "_"
-            const safeStart = start_date.replace(/-/g, '_');
-            const safeEnd = end_date.replace(/-/g, '_');
-
-            // Filename final sesuai permintaan
-            const safeFilename = `magang_${safeStart}_to_${safeEnd}_${safeCompany}`;
-            
-            studentTable = $('#student-table').DataTable({
-                responsive: true,
-                dom: 'Bfrtip',
-                buttons: [{
-                    extend: 'excelHtml5',
-                    title: null,
-                    filename: safeFilename,
-                    customize: function (xlsx) {
-                        const sheet = xlsx.xl.worksheets['sheet1.xml'];
-                        const contextRow = `
-                    <row r="1">
-                        <c t="inlineStr" r="A1"><is><t>${title}</t></is></c>
-                    </row>
-                `;
-
-                        const rows = $('row', sheet);
-                        rows.each(function () {
-                            const r = parseInt($(this).attr('r'), 10);
-                            $(this).attr('r', r + 1);
-                            $('c', this).each(function () {
-                                const cellRef = $(this).attr('r');
-                                const col = cellRef.replace(/[0-9]/g, '');
-                                const rowNum = parseInt(cellRef.replace(/[A-Z]/g,
-                                    ''), 10);
-                                $(this).attr('r', `${col}${rowNum + 1}`);
-                            });
-                        });
-
-                        sheet.childNodes[0].childNodes[1].innerHTML =
-                            contextRow + sheet.childNodes[0].childNodes[1].innerHTML;
-                    }
-                }],
-                responsive: true,
-                destroy: true,
-                lengthChange: false,
-                paging: true
-            });
-        }
-
-        $(document).ready(function () {
-            $('#ranking-table').DataTable({
-                responsive: true,
-            });
-
-
-            // Tombol lihat mahasiswa
-            $(document).on('click', 'button[data-id]', function () {
-                const button = $(this);
-
-                const id_company = button.data('id');
-                const start_date = button.data('start_date');
-                const end_date = button.data('end_date');
-                const major = button.data('major');
-                const prodi = button.data('prodi');
-                const companyName = button.data('company');
-                const ranking = button.data('ranking');
-
-                // Simpan teks asli tombol dan ganti dengan spinner
-                const originalText = button.html();
-                button.prop('disabled', true).html(
-                    `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Memuat...`
-                    );
-
-                $.ajax({
-                    url: 'index.php?api=companies_ranking_received_student',
-                    method: 'POST',
-                    data: {
-                        id_company: id_company,
-                        start_date: start_date,
-                        end_date: end_date,
-                        major: major,
-                        prodi: prodi,
-                        token: '<?= env(APP_TOKEN) ?? "" ?>' // Ganti sesuai kebutuhan
-                    },
-                    dataType: 'json',
-                    success: function (response) {
-                            const infoText =
-                                `Daftar Mahasiswa Magang, Perusahaan: ${companyName} | Periode: ${start_date} - ${end_date} | Peringkat ke-${ranking}`;
-                            $('#student-info-title').text(infoText);
-                            $('#student-wrapper').slideDown();
-
-                            if (studentTable && $.fn.DataTable.isDataTable('#student-table')) {
-                                studentTable.clear(); // bersihkan datanya
-                            } else {
-                                $('#student-table tbody').empty(); // fallback
-                            }
-
-                            if (Array.isArray(response) && response.length > 0) {
-                                response.forEach(row => {
-                                    const rowData = [
-                                        row.nim, row.student_name, row.jurusan,
-                                        `${row.jenjang} ${row.prodi}`, row
-                                        .start_date, row.end_date, row.status
-                                    ];
-
-                                    if (studentTable) {
-                                        studentTable.row.add(
-                                        rowData); // tambahkan ke DataTable
-                                    } else {
-                                        $('#student-table tbody').append(`
-                                            <tr>
-                                                <td>${row.nim}</td>
-                                                <td>${row.student_name}</td>
-                                                <td>${row.jurusan}</td>
-                                                <td>${row.jenjang} ${row.prodi}</td>
-                                                <td>${row.start_date}</td>
-                                                <td>${row.end_date}</td>
-                                                <td>${row.status}</td>
-                                            </tr>
-                                        `);
-                                    }
-                                });
-
-                                if (studentTable) {
-                                    studentTable.draw(); // render ulang
-                                }
-                            } else {
-                                $('#student-table tbody').append(`
-                                    <tr>
-                                        <td colspan="7" class="text-center">Tidak ada data mahasiswa ditemukan.</td>
-                                    </tr>
-                                `);
-                            }
-
-                            // Inisialisasi ulang (opsional jika pertama kali)
-                            initStudentTable(infoText, companyName, start_date, end_date);
-                        }
-
-                        ,
-                    error: function (xhr, status, error) {
-                        console.error("❌ Terjadi kesalahan:", status, error);
-                        console.log("Response Text:", xhr.responseText);
-                    },
-                    complete: function () {
-                        // Kembalikan tombol ke kondisi semula
-                        button.prop('disabled', false).html(originalText);
-                    }
-                });
-            });
-
         });
-    </script>
 
-</body>
+        // Inisialisasi tombol Cetak DataTables (dihubungkan ke tombol Cetak di header tabel)
+        new $.fn.dataTable.Buttons(table, {
+            buttons: [
+                {
+                    extend: 'print',
+                    title: 'Data Mahasiswa Magang - CDC Polibatam',
+                    messageTop: 'Periode: <?= htmlspecialchars($start_date) ?> s/d <?= htmlspecialchars($end_date) ?> | Jurusan: <?= htmlspecialchars($major ?: "Semua Jurusan") ?>',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4, 5, 6]
+                    }
+                }
+            ]
+        });
 
-</html>
+        // Saat tombol #btn-print-table diklik, jalankan fungsi cetak
+        $('#btn-print-table').on('click', function () {
+            table.button(0).trigger();
+        });
+    });
+</script>
+@endpush
