@@ -403,6 +403,93 @@ $stmt_stat = $_SERVER['PDO']->prepare($sql);
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
+    {{-- Helper Label Formatter --}}
+    <script>
+        /**
+         * Helper untuk memecah teks nama perusahaan menjadi multi-baris
+         * agar tulisan sumbu X tetap horizontal (tidak miring) dan rapi.
+         */
+        function formatChartLabel(text, maxCharsPerLine = 17, maxLines = 3) {
+            if (!text) return '';
+            if (typeof text !== 'string') text = String(text);
+            text = text.trim();
+
+            if (text.length <= maxCharsPerLine) {
+                return text;
+            }
+
+            const words = text.split(/\s+/).filter(Boolean);
+            const lines = [];
+            let currentLine = '';
+
+            for (let i = 0; i < words.length; i++) {
+                const word = words[i];
+
+                if (!currentLine) {
+                    if (word.length > maxCharsPerLine) {
+                        if (lines.length === maxLines - 1) {
+                            lines.push(word.substring(0, maxCharsPerLine - 3) + '...');
+                            currentLine = '';
+                            break;
+                        } else {
+                            lines.push(word.substring(0, maxCharsPerLine));
+                            words.splice(i + 1, 0, word.substring(maxCharsPerLine));
+                            continue;
+                        }
+                    } else {
+                        currentLine = word;
+                    }
+                } else {
+                    const testLine = currentLine + ' ' + word;
+                    if (testLine.length <= maxCharsPerLine) {
+                        currentLine = testLine;
+                    } else {
+                        lines.push(currentLine);
+                        currentLine = '';
+
+                        if (lines.length === maxLines - 1) {
+                            const remainingWords = words.slice(i);
+                            const remainingStr = remainingWords.join(' ');
+                            if (remainingStr.length <= maxCharsPerLine) {
+                                lines.push(remainingStr);
+                                break;
+                            }
+
+                            let lastLine = '';
+                            let hasOverflow = false;
+                            for (let j = i; j < words.length; j++) {
+                                const w = words[j];
+                                const testLast = lastLine ? (lastLine + ' ' + w) : w;
+                                const maxLen = (j === words.length - 1) ? maxCharsPerLine : (maxCharsPerLine - 3);
+                                if (testLast.length <= maxLen) {
+                                    lastLine = testLast;
+                                } else {
+                                    hasOverflow = true;
+                                    break;
+                                }
+                            }
+
+                            if (!lastLine) {
+                                lastLine = words[i].substring(0, maxCharsPerLine - 3);
+                                hasOverflow = true;
+                            }
+                            lines.push(lastLine + (hasOverflow ? '...' : ''));
+                            break;
+                        } else {
+                            i--;
+                        }
+                    }
+                }
+            }
+
+            if (currentLine && lines.length < maxLines) {
+                lines.push(currentLine);
+            }
+
+            return lines.length === 1 ? lines[0] : lines;
+        }
+    </script>
+
     {{-- Company Trophies --}}
     <script>
         // Data dari PHP
@@ -414,10 +501,10 @@ $stmt_stat = $_SERVER['PDO']->prepare($sql);
             const year = row.tahun;
             if (!dataByYear[year]) dataByYear[year] = [];
             dataByYear[year].push({
-                label: row.name_company
-                , value: row.jumlah_mahasiswa
-                , ranking: row.ranking, // Tambahkan ranking
-                year: row.tahun // Menyimpan tahun untuk tooltip
+                label: row.name_company,
+                value: row.jumlah_mahasiswa,
+                ranking: row.ranking,
+                year: row.tahun
             });
         });
 
@@ -435,7 +522,7 @@ $stmt_stat = $_SERVER['PDO']->prepare($sql);
             yearSelect.appendChild(option);
         }
 
-        // Default tahun: tahun sebelumnya
+        // Default tahun: tahun sekarang
         const defaultYear = currentYear;
         yearSelect.value = defaultYear;
 
@@ -445,83 +532,138 @@ $stmt_stat = $_SERVER['PDO']->prepare($sql);
         function updateChart(year) {
             const dataset = dataByYear[year] || [];
 
-            const labels = dataset.map(d => d.label);
+            // Bungkus label agar rapi & sumbu x tidak miring
+            const formattedLabels = dataset.map(d => formatChartLabel(d.label, 17, 3));
             const data = dataset.map(d => d.value);
-            const rankings = dataset.map(d => `Rank ${d.ranking}`); // Mengambil ranking
+            const rankings = dataset.map(d => `Rank ${d.ranking}`);
 
-            const maxY = Math.max(...data, 0) + 5;
+            const maxY = Math.max(...data, 0) + 3;
 
             const colors = dataset.map((_, index) => {
-                if (index === 0) return 'rgba(255, 99, 132, 0.6)';
-                if (index === 1) return 'rgba(54, 162, 235, 0.6)';
-                if (index === 2) return 'rgba(255, 159, 64, 0.6)';
-                return 'rgba(75, 192, 192, 0.6)';
+                if (index === 0) return 'rgba(255, 99, 132, 0.7)';
+                if (index === 1) return 'rgba(54, 162, 235, 0.7)';
+                if (index === 2) return 'rgba(255, 159, 64, 0.7)';
+                return 'rgba(75, 192, 192, 0.7)';
             });
 
             if (chart) chart.destroy();
 
             chart = new Chart(ctx, {
-                type: 'bar'
-                , data: {
-                    labels: labels,
-
+                type: 'bar',
+                data: {
+                    labels: formattedLabels,
                     datasets: [{
-                        label: `Student(s) received in (${year})`
-                        , data: data
-                        , backgroundColor: colors
-                        , borderColor: colors.map(color => color.replace('0.6', '1'))
-                        , borderWidth: 1
+                        label: `Student(s) received in (${year})`,
+                        data: data,
+                        backgroundColor: colors,
+                        borderColor: colors.map(color => color.replace('0.7', '1')),
+                        borderWidth: 1,
+                        borderRadius: 4,
+                        maxBarThickness: 55
                     }]
-                }
-                , options: {
-                    responsive: true
-                    , maintainAspectRatio: true
-                    , plugins: {
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    layout: {
+                        padding: {
+                            top: 20,
+                            bottom: 10,
+                            left: 10,
+                            right: 15
+                        }
+                    },
+                    plugins: {
                         legend: {
-                            display: false // ✅ Legend non-interaktif
-                        }
-                        , datalabels: {
-                            anchor: 'end'
-                            , align: 'top'
-                            , formatter: (value) => value, // Hanya tampilkan jumlah mahasiswa
-                            color: 'black'
-                            , font: {
-                                weight: 'bold'
+                            display: false
+                        },
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'top',
+                            offset: 2,
+                            formatter: (value) => value,
+                            color: '#212529',
+                            font: {
+                                weight: 'bold',
+                                size: 11
                             }
-                        }
-                        , tooltip: {
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(33, 37, 41, 0.95)',
+                            titleFont: {
+                                size: 13,
+                                weight: 'bold'
+                            },
+                            bodyFont: {
+                                size: 12
+                            },
+                            padding: 10,
+                            cornerRadius: 6,
                             callbacks: {
+                                title: function(tooltipItems) {
+                                    if (!tooltipItems || !tooltipItems.length) return '';
+                                    const index = tooltipItems[0].dataIndex;
+                                    const item = dataset[index];
+                                    return item ? item.label : tooltipItems[0].label;
+                                },
                                 label: function(context) {
                                     const index = context.dataIndex;
                                     const item = dataset[index];
-
-                                    // Menampilkan tooltip dengan tahun yang sesuai
+                                    if (!item) return '';
                                     return `Student(s) received in (${item.year}): ${item.value} students, (Rank ${item.ranking})`;
                                 }
                             }
                         }
-                    }
-                    , scales: {
+                    },
+                    scales: {
                         x: {
                             title: {
-                                display: true
-                                , text: 'Company'
+                                display: true,
+                                text: 'Company',
+                                font: {
+                                    weight: 'bold',
+                                    size: 12
+                                },
+                                padding: {
+                                    top: 10
+                                }
+                            },
+                            ticks: {
+                                maxRotation: 0,
+                                minRotation: 0,
+                                autoSkip: false,
+                                color: '#333333',
+                                font: {
+                                    size: 11
+                                }
+                            },
+                            grid: {
+                                display: false
                             }
-                        }
-                        , y: {
-                            beginAtZero: true
-                            , suggestedMax: maxY
-                            , title: {
-                                display: true
-                                , text: 'Total Students'
-                            }
-                            , ticks: {
-                                precision: 0
+                        },
+                        y: {
+                            beginAtZero: true,
+                            suggestedMax: maxY,
+                            title: {
+                                display: true,
+                                text: 'Total Students',
+                                font: {
+                                    weight: 'bold',
+                                    size: 12
+                                }
+                            },
+                            ticks: {
+                                precision: 0,
+                                stepSize: 1,
+                                color: '#555555'
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
                             }
                         }
                     }
-                }
-                , plugins: [ChartDataLabels]
+                },
+                plugins: [ChartDataLabels]
             });
 
             chartLegend.textContent = `Ranking of companies receiving internship students (${year})`;
@@ -537,19 +679,18 @@ $stmt_stat = $_SERVER['PDO']->prepare($sql);
 
         // Event listener untuk tombol Download PDF
         document.getElementById("trophies_generatePDF").addEventListener("click", function() {
-            const {
-                jsPDF
-            } = window.jspdf;
+            const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
 
             // Ambil gambar dari canvas (toDataURL akan menghasilkan gambar PNG)
             const canvasDataUrl = document.getElementById("chart-company").toDataURL("image/png");
 
             // Masukkan gambar ke PDF
-            doc.addImage(canvasDataUrl, 'PNG', 10, 10, 180, 100); // Sesuaikan ukuran gambar
+            doc.addImage(canvasDataUrl, 'PNG', 10, 10, 180, 100);
 
-            // Simpan PDF
-            doc.save(`trophies_chart_${defaultYear}.pdf`);
+            // Simpan PDF dengan tahun terpilih
+            const selectedYear = document.getElementById("year-selector").value || defaultYear;
+            doc.save(`trophies_chart_${selectedYear}.pdf`);
         });
 
         document.getElementById('trophies_generateExcel').addEventListener('click', function() {
@@ -563,11 +704,11 @@ $stmt_stat = $_SERVER['PDO']->prepare($sql);
 
             // Format data jadi array of objects untuk SheetJS
             const excelData = filteredData.map(item => ({
-                Tahun: item.tahun
-                , ID_Company: item.id_company
-                , Nama_Perusahaan: item.name_company
-                , Jumlah_Mahasiswa: item.jumlah_mahasiswa
-                , Ranking: item.ranking
+                Tahun: item.tahun,
+                ID_Company: item.id_company,
+                Nama_Perusahaan: item.name_company,
+                Jumlah_Mahasiswa: item.jumlah_mahasiswa,
+                Ranking: item.ranking
             }));
 
             // Convert ke worksheet
@@ -587,7 +728,6 @@ $stmt_stat = $_SERVER['PDO']->prepare($sql);
             const url = `index.php?page=show_data&action=companies_ranking_received_student&year=${year}`;
             document.getElementById('show-data-companies-trophy-btn').setAttribute('href', url);
         });
-
     </script>
 
 
@@ -619,69 +759,125 @@ $stmt_stat = $_SERVER['PDO']->prepare($sql);
             majorSelector.appendChild(opt);
         });
 
+        let currentMajorSorted = [];
+
         // Inisialisasi chart kosong
         const majorChart = new Chart(majorChartCanvas, {
-            type: 'bar'
-            , data: {
-                labels: []
-                , datasets: [{
-                    label: ''
-                    , data: []
-                    , backgroundColor: []
-                , }]
-            }
-            , options: {
-                responsive: true
-                , plugins: {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: '',
+                    data: [],
+                    backgroundColor: [],
+                    borderColor: [],
+                    borderWidth: 1,
+                    borderRadius: 4,
+                    maxBarThickness: 55
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                layout: {
+                    padding: {
+                        top: 20,
+                        bottom: 10,
+                        left: 10,
+                        right: 15
+                    }
+                },
+                plugins: {
                     legend: {
                         display: false
-                    }
-                    , tooltip: {
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(33, 37, 41, 0.95)',
+                        titleFont: {
+                            size: 13,
+                            weight: 'bold'
+                        },
+                        bodyFont: {
+                            size: 12
+                        },
+                        padding: 10,
+                        cornerRadius: 6,
                         callbacks: {
+                            title: function(tooltipItems) {
+                                if (!tooltipItems || !tooltipItems.length) return '';
+                                const item = currentMajorSorted[tooltipItems[0].dataIndex];
+                                return item ? item.name_company : tooltipItems[0].label;
+                            },
                             label: function(context) {
-                                const item = majorData.find(d =>
-                                    d.tahun == majorYearSelector.value &&
-                                    d.jurusan == majorSelector.value &&
-                                    d.name_company === context.label
-                                );
+                                const item = currentMajorSorted[context.dataIndex];
                                 if (item) {
                                     return `Student(s) received in (${item.tahun}): ${item.jumlah_mahasiswa} student(s), (Rank ${item.ranking})`;
                                 }
                                 return context.label;
                             }
                         }
-                    }
-                    , datalabels: {
-                        anchor: 'end'
-                        , align: 'top'
-                        , formatter: (value) => value
-                        , color: '#000'
-                        , font: {
-                            weight: 'bold'
+                    },
+                    datalabels: {
+                        anchor: 'end',
+                        align: 'top',
+                        offset: 2,
+                        formatter: (value) => value,
+                        color: '#212529',
+                        font: {
+                            weight: 'bold',
+                            size: 11
                         }
                     }
-                }
-                , scales: {
+                },
+                scales: {
                     x: {
                         title: {
-                            display: true
-                            , text: 'Company'
+                            display: true,
+                            text: 'Company',
+                            font: {
+                                weight: 'bold',
+                                size: 12
+                            },
+                            padding: {
+                                top: 10
+                            }
+                        },
+                        ticks: {
+                            maxRotation: 0,
+                            minRotation: 0,
+                            autoSkip: false,
+                            color: '#333333',
+                            font: {
+                                size: 11
+                            }
+                        },
+                        grid: {
+                            display: false
                         }
-                    }
-                    , y: {
-                        beginAtZero: true
-                        , suggestedMax: 10
-                        , ticks: {
-                            stepSize: 5
-                        }
-                        , title: {
-                            display: true
-                            , text: 'Total Student'
+                    },
+                    y: {
+                        beginAtZero: true,
+                        suggestedMax: 10,
+                        ticks: {
+                            precision: 0,
+                            stepSize: 1,
+                            color: '#555555'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Total Students',
+                            font: {
+                                weight: 'bold',
+                                size: 12
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
                         }
                     }
                 }
-            }
-            , plugins: [ChartDataLabels]
+            },
+            plugins: [ChartDataLabels]
         });
 
         function updateMajorChart() {
@@ -693,25 +889,30 @@ $stmt_stat = $_SERVER['PDO']->prepare($sql);
                 item.jurusan == selectedMajor
             );
 
-            const sorted = [1, 2, 3, 4, 5].map(rank => {
+            currentMajorSorted = [1, 2, 3, 4, 5].map(rank => {
                 return filtered.find(item => parseInt(item.ranking) === rank);
             }).filter(Boolean);
 
-            const labels = sorted.map(item => item.name_company);
-            const values = sorted.map(item => parseInt(item.jumlah_mahasiswa));
-            const colors = sorted.map((_, index) => {
-                if (index === 0) return 'rgba(255, 99, 132, 0.6)';
-                if (index === 1) return 'rgba(54, 162, 235, 0.6)';
-                if (index === 2) return 'rgba(255, 159, 64, 0.6)';
-                return 'rgba(75, 192, 192, 0.6)';
+            const rawLabels = currentMajorSorted.map(item => item.name_company);
+            const formattedLabels = rawLabels.map(name => formatChartLabel(name, 17, 3));
+            const values = currentMajorSorted.map(item => parseInt(item.jumlah_mahasiswa));
+            const colors = currentMajorSorted.map((_, index) => {
+                if (index === 0) return 'rgba(255, 99, 132, 0.7)';
+                if (index === 1) return 'rgba(54, 162, 235, 0.7)';
+                if (index === 2) return 'rgba(255, 159, 64, 0.7)';
+                return 'rgba(75, 192, 192, 0.7)';
             });
 
-            const maxValue = Math.max(...values, 0) + 5;
+            const maxValue = Math.max(...values, 0) + 3;
 
             // Update chart data
-            majorChart.data.labels = labels;
+            majorChart.data.labels = formattedLabels;
             majorChart.data.datasets[0].data = values;
             majorChart.data.datasets[0].backgroundColor = colors;
+            majorChart.data.datasets[0].borderColor = colors.map(color => color.replace('0.7', '1'));
+            majorChart.data.datasets[0].borderWidth = 1;
+            majorChart.data.datasets[0].borderRadius = 4;
+            majorChart.data.datasets[0].maxBarThickness = 55;
             majorChart.data.datasets[0].label = `Students Received (${selectedYear} - ${selectedMajor})`;
             majorChart.options.scales.y.suggestedMax = maxValue;
 
@@ -752,10 +953,6 @@ $stmt_stat = $_SERVER['PDO']->prepare($sql);
         setTimeout(updateMajorURL, 300);
     </script>
 
-
-
-
-
     <script>
         Circles.create({
             id: 'circles-0'
@@ -770,7 +967,7 @@ $stmt_stat = $_SERVER['PDO']->prepare($sql);
             , textClass: 'circles-text'
             , styleWrapper: true
             , styleText: true
-        })
+        });
 
         Circles.create({
             id: 'circles-1'
@@ -785,7 +982,7 @@ $stmt_stat = $_SERVER['PDO']->prepare($sql);
             , textClass: 'circles-text'
             , styleWrapper: true
             , styleText: true
-        })
+        });
 
         Circles.create({
             id: 'circles-2'
@@ -800,7 +997,7 @@ $stmt_stat = $_SERVER['PDO']->prepare($sql);
             , textClass: 'circles-text'
             , styleWrapper: true
             , styleText: true
-        })
+        });
 
         Circles.create({
             id: 'circles-3'
@@ -815,8 +1012,7 @@ $stmt_stat = $_SERVER['PDO']->prepare($sql);
             , textClass: 'circles-text'
             , styleWrapper: true
             , styleText: true
-        })
-
+        });
 
         Circles.create({
             id: 'circles-4'
@@ -831,7 +1027,7 @@ $stmt_stat = $_SERVER['PDO']->prepare($sql);
             , textClass: 'circles-text'
             , styleWrapper: true
             , styleText: true
-        })
+        });
 
         Circles.create({
             id: 'circles-5'
@@ -846,7 +1042,6 @@ $stmt_stat = $_SERVER['PDO']->prepare($sql);
             , textClass: 'circles-text'
             , styleWrapper: true
             , styleText: true
-        })
-
+        });
     </script>
     @endpush
